@@ -5,6 +5,9 @@ import dynamic from "next/dynamic";
 
 import { GbfsClient, PRESET_CITIES, StationInformation } from "@/libs/gbfs/gbfs-client";
 import StationCard from "@/components/StationCard";
+import { MapContainer } from "react-leaflet";
+import type { Map as LeafletMapInstance } from "leaflet";
+
 
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
   ssr: false,
@@ -86,11 +89,18 @@ export default function Home() {
 
   const activeStationRef = useRef<HTMLDivElement | null>(null);
   const stationCardRefs = useRef(new Map<string, HTMLDivElement>());
+  const mapRef = useRef<LeafletMapInstance | null>(null);
 
   function scrollToStation(station: StationInformation) {
     const card = stationCardRefs.current.get(station.station_id) ?? null;
     activeStationRef.current = card;
     card?.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  function mapPanToStation(station: StationInformation) {
+    if (mapRef.current && typeof station.lat === 'number' && typeof station.lon === 'number') {
+      mapRef.current.flyTo([station.lat, station.lon], 18);
+    }
   }
 
   return (
@@ -196,11 +206,13 @@ export default function Home() {
                   cardRef={(element) => {
                     if(element) stationCardRefs.current.set(station.station_id, element);
                     else stationCardRefs.current.delete(station.station_id);
-                  }} />
+                  }}
+                  onClick={mapPanToStation}
+                   />
                 ))}
               </div>
               <div className="flex w-full">
-                <LeafletMap stations={stations} onMarkerClick={scrollToStation} />
+                <LeafletMap stations={stations} onMarkerClick={scrollToStation} mapRef={mapRef} />
               </div>
             </div>
           )}

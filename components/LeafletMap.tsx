@@ -3,6 +3,7 @@
 import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import type { Map as LeafletMapInstance } from "leaflet";
 // Source - https://stackoverflow.com/a/74443999
 // Posted by Disco
 // Retrieved 2026-09-29, License - CC BY-SA 4.0
@@ -12,16 +13,20 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 
 import { StationInformation } from '@/libs/gbfs/gbfs-client';
 
+
 interface LeafletMapProps
 {
     stations: StationInformation[];
     onMarkerClick?: (station: StationInformation) => void;
+    mapRef: React.RefObject<LeafletMapInstance | null>;
 }
 
-export default function LeafletMap({ stations, onMarkerClick }: LeafletMapProps) {
+
+
+export default function LeafletMap({ stations, onMarkerClick, mapRef }: LeafletMapProps) {
     return (
         <div className='flex w-[100%] rounded-xl'>
-            <MapContainer center={[40.730610, -73.935242]} zoom={13} style={{ height: '100vh', width: '100%' }}>
+            <MapContainer ref={mapRef} center={[40.730610, -73.935242]} zoom={13} style={{ height: '100vh', width: '100%' }}>
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
