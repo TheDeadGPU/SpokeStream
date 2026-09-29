@@ -1,9 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 
 import { GbfsClient, PRESET_CITIES } from "@/libs/gbfs/gbfs-client";
 import StationCard from "@/components/StationCard";
+
+const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
+  ssr: false,
+  loading: () => <div className="h-[100vh] w-full" />,
+});
 
 type CityOption = (typeof PRESET_CITIES)[number];
 
@@ -117,11 +123,12 @@ export default function Home() {
           </label>
         </header>
 
-        <section className="mb-8 grid gap-4 md:grid-cols-3">
+        <section className="mb-8 grid gap-4 md:grid-cols-4">
           {[
-            { label: "Available bikes", value: summary.totalBikes, accent: "cyan" },
-            { label: "Open docks", value: summary.totalDocks, accent: "emerald" },
-            { label: "Active stations", value: summary.activeStations, accent: "violet" },
+            { label: "Available bikes", value: summary.totalBikes.toLocaleString(), accent: "cyan" },
+            { label: "Available e-bikes", value: summary.totalEbikes.toLocaleString(), accent: "yellow" },
+            { label: "Open docks", value: summary.totalDocks.toLocaleString(), accent: "emerald" },
+            { label: "Active stations", value: summary.activeStations.toLocaleString(), accent: "violet" },
           ].map((item) => (
             <div
               key={item.label}
@@ -171,14 +178,14 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="flex flex-row">
-              <div className="grid gap-4 grid-cols-1">
+            <div className="flex flex-row gap-4">
+              <div className="grid gap-4 grid-cols-1 h-[100vh] overflow-y-auto">
                 {stations.slice(0, 12).map((station) => (
-                  <StationCard station={station} />
+                  <StationCard station={station} key={station.station_id} />
                 ))}
               </div>
-              <div>
-                <p>Map</p>
+              <div className="flex w-full">
+                <LeafletMap stations={stations} />
               </div>
             </div>
 
