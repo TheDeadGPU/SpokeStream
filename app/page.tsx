@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 
-import { GbfsClient, PRESET_CITIES } from "@/libs/gbfs/gbfs-client";
+import { GbfsClient, PRESET_CITIES, StationInformation } from "@/libs/gbfs/gbfs-client";
 import StationCard from "@/components/StationCard";
 
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
@@ -83,6 +83,15 @@ export default function Home() {
       totalEbikes,
     };
   }, [stations]);
+
+  const activeStationRef = useRef<HTMLDivElement | null>(null);
+  const stationCardRefs = useRef(new Map<string, HTMLDivElement>());
+
+  function scrollToStation(station: StationInformation) {
+    const card = stationCardRefs.current.get(station.station_id) ?? null;
+    activeStationRef.current = card;
+    card?.scrollIntoView({behavior:"smooth", block:"start"});
+  }
 
   return (
     <main className="min-h-screen bg-[#050816] text-slate-100">
@@ -180,15 +189,20 @@ export default function Home() {
           ) : (
             <div className="flex flex-row gap-4">
               <div className="grid gap-4 grid-cols-1 h-[100vh] overflow-y-auto">
-                {stations.slice(0, 12).map((station) => (
-                  <StationCard station={station} key={station.station_id} />
+                {stations.map((station) => (
+                  <StationCard 
+                  station={station} 
+                  key={station.station_id}
+                  cardRef={(element) => {
+                    if(element) stationCardRefs.current.set(station.station_id, element);
+                    else stationCardRefs.current.delete(station.station_id);
+                  }} />
                 ))}
               </div>
               <div className="flex w-full">
-                <LeafletMap stations={stations} />
+                <LeafletMap stations={stations} onMarkerClick={scrollToStation} />
               </div>
             </div>
-
           )}
         </section>
       </div>

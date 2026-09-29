@@ -2,12 +2,14 @@ import type { StationInformation } from "../libs/gbfs/gbfs-client";
 
 interface StationCardProps {
     station: StationInformation;
+    cardRef: (element: HTMLDivElement | null) => void;
 }
 
-export default function StationCard({ station }: StationCardProps) {
+export default function StationCard({ station, cardRef }: StationCardProps) {
     return (
         <div
             key={station.station_id}
+            ref={cardRef}
             className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 transition hover:border-cyan-400/40 hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]"
         >
             <div className="mb-4 flex items-start justify-between gap-3">

@@ -14,11 +14,11 @@ import { StationInformation } from '@/libs/gbfs/gbfs-client';
 
 interface LeafletMapProps
 {
-    
     stations: StationInformation[];
+    onMarkerClick?: (station: StationInformation) => void;
 }
 
-export default function LeafletMap({ stations }: LeafletMapProps) {
+export default function LeafletMap({ stations, onMarkerClick }: LeafletMapProps) {
     return (
         <div className='flex w-[100%] rounded-xl'>
             <MapContainer center={[40.730610, -73.935242]} zoom={13} style={{ height: '100vh', width: '100%' }}>
@@ -35,7 +35,11 @@ export default function LeafletMap({ stations }: LeafletMapProps) {
                     }
 
                     return (
-                        <Marker key={station.station_id} position={[station.lat, station.lon]}>
+                        <Marker 
+                            key={station.station_id} 
+                            position={[station.lat, station.lon]}
+                            eventHandlers={{ click: () => onMarkerClick?.(station) }}
+                        >
                             <Popup>{station.name}</Popup>
                         </Marker>
                     );
