@@ -5,12 +5,13 @@ import { IconMapPin } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 export default function LocateButton() {
-    const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
     const [locatingUser, setLocatingUser] = useState(false);
     const {
         mapRef,
+        userLocation,
+        setUserLocation,
     } = useSpokeStreamStore();
-    
+
     function handleRequestLocation() {
         if (!navigator.geolocation) {
             console.warn('Geolocation is not supported by your browser');
@@ -32,9 +33,8 @@ export default function LocateButton() {
     }
 
     useEffect(() => {
-        if(userLocation)
-        {
-            mapRef.current?.flyTo([userLocation?.lat,userLocation?.lon], 13)
+        if (userLocation) {
+            mapRef.current?.flyTo([userLocation?.lat, userLocation?.lon], 13)
         }
     }, [userLocation])
 
@@ -46,7 +46,7 @@ export default function LocateButton() {
             className={`px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors ${userLocation ? 'bg-cyan-500/20 border-cyan-500 text-cyan-300' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
                 }`}
         >
-            <IconMapPin className={`w-4 h-4 ${locatingUser ? 'animate-spin text-cyan-400' : ''}`} />
+            <IconMapPin className={`w-4 h-4 ${locatingUser ? 'text-cyan-400' : ''}`} />
             <span className="hidden sm:inline">{userLocation ? 'Near Me' : 'Locate'}</span>
         </button>
     )

@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import type { StationInformation } from "../libs/gbfs/gbfs-client";
+import useSpokeStreamStore from "@/hook/useSpokeStreamStore";
+import { calculateDistance } from "@/libs/helper-functions";
 
 interface StationCardProps {
     station: StationInformation;
@@ -10,6 +13,15 @@ export default function StationCard({ station, cardRef, onClick }: StationCardPr
     const stationAvailabilityPercent = station.capacity && station.capacity > 0
         ? Math.round(((station.num_bikes_available ?? 0) / station.capacity) * 100)
         : null;
+    const { userLocation } = useSpokeStreamStore();
+    const [distance, setDistance] = useState(0);
+    
+    useEffect(() => {
+        if(station.lat && station.lon && userLocation)
+        {
+            setDistance(calculateDistance(station.lat, station.lon,userLocation.lat, userLocation.lon));
+        }
+    },[userLocation])
     return (
         <div
             key={station.station_id}
@@ -18,20 +30,15 @@ export default function StationCard({ station, cardRef, onClick }: StationCardPr
             onClick={() => onClick(station)}
         >
             <div className="mb-4 flex items-start justify-between gap-3">
-                <div>
+                <div className="flex items-center gap-2">
+                    <div className={`w-2.5 h-2.5 rounded-full ${station.is_installed == false ? "bg-red-500" : "bg-emerald-500"} shrink-0`} />
                     <p className="text-sm font-medium text-white">
                         {station.name || "Unnamed station"}
                     </p>
                 </div>
-                <span
-                    className={`rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.2em] ${station.is_installed == false
-                            ? "bg-rose-500/10 text-rose-300"
-                            : "bg-emerald-500/10 text-emerald-300"
-                        }`}
-                >
-                    {station.is_installed == false ? "Offline" : "Open"}
-                    {station.is_installed == true && ` · ${stationAvailabilityPercent !== null ? `${stationAvailabilityPercent}%` : ""}`}
-                </span>
+                <div>
+                    {userLocation && (<span className="rounded-full text-sm">{distance.toFixed(1)} miles</span>)}
+                </div>
             </div>
 
             <div className="grid grid-cols-3 gap-3 text-sm text-slate-300">

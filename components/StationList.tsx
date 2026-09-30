@@ -45,19 +45,19 @@ export default function StationList() {
     return (
         <div className="flex w-[350px] shrink-0 flex-col">
             <div>
-                <div className="relative flex-1">
-                    <IconSearch className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                <div className="relative flex items-center gap-2">
+                    <IconSearch className="absolute left-3 top-1/2 w-4 h-4 -translate-y-1/2 text-slate-400" />
                     <input
                         type="text"
                         placeholder="Search station by name..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                        className="min-w-0 flex-1 bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
                     />
-                    <LocateButton/>
+                    <LocateButton />
                 </div>
             </div>
-            <div className="grid gap-4 grid-cols-1 h-[100vh] overflow-y-auto">
+            <div className="grid gap-4 grid-cols-1 h-[100vh] overflow-y-auto mt-2">
                 {filteredStations && filteredStations.map((station) => (
                     <StationCard
                         station={station}
