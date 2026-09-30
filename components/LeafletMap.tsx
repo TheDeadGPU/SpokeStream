@@ -12,17 +12,16 @@ import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 
 import { StationInformation } from '@/libs/gbfs/gbfs-client';
+import useSpokeStreamStore from '@/hook/useSpokeStreamStore';
 
 
 interface LeafletMapProps {
-    stations: StationInformation[];
     onMarkerClick?: (station: StationInformation) => void;
-    mapRef: React.RefObject<LeafletMapInstance | null>;
 }
 
 
 
-export default function LeafletMap({ stations, onMarkerClick, mapRef }: LeafletMapProps) {
+export default function LeafletMap({onMarkerClick}: LeafletMapProps) {
 
     const icons = {
         redIcon: new L.Icon({
@@ -51,6 +50,13 @@ export default function LeafletMap({ stations, onMarkerClick, mapRef }: LeafletM
         })
     };
 
+    const {
+        stations,
+        activeStation,
+        setActiveStation,
+        mapRef,
+    }= useSpokeStreamStore();
+
     return (
         <div className='flex w-[100%] rounded-xl'>
             <MapContainer ref={mapRef} center={[40.730610, -73.935242]} zoom={13} style={{ height: '100vh', width: '100%' }}>
@@ -67,7 +73,7 @@ export default function LeafletMap({ stations, onMarkerClick, mapRef }: LeafletM
                         <Marker
                             key={station.station_id}
                             position={[station.lat, station.lon]}
-                            eventHandlers={{ click: () => onMarkerClick?.(station) }}
+                            eventHandlers={{ click: () =>  setActiveStation(station)}}
                             icon={station.is_installed ? icons.green : icons.redIcon}
                         >
                             <Popup>{station.name}</Popup>

@@ -8,6 +8,8 @@ import StationCard from "@/components/StationCard";
 import { MapContainer } from "react-leaflet";
 import type { Map as LeafletMapInstance } from "leaflet";
 import { IconBike, IconGlobe, IconWorld } from "@tabler/icons-react";
+import useSpokeStreamStore from "@/hook/useSpokeStreamStore";
+import StationList from "@/components/StationList";
 
 
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
@@ -19,11 +21,13 @@ type CityOption = (typeof PRESET_CITIES)[number];
 
 export default function Home() {
   const [selectedCity, setSelectedCity] = useState<CityOption>(PRESET_CITIES[0]);
-  const [stations, setStations] = useState<
-    Awaited<ReturnType<GbfsClient["getGBFS"]>>["stations"]
-  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { 
+    stations, 
+    setStations,
+    mapRef 
+  } = useSpokeStreamStore();
 
   useEffect(() => {
     let ignore = false;
@@ -88,11 +92,12 @@ export default function Home() {
     };
   }, [stations]);
 
-  const activeStationRef = useRef<HTMLDivElement | null>(null);
-  const stationCardRefs = useRef(new Map<string, HTMLDivElement>());
-  const mapRef = useRef<LeafletMapInstance | null>(null);
+  //const activeStationRef = useRef<HTMLDivElement | null>(null);
+  //const stationCardRefs = useRef(new Map<string, HTMLDivElement>());
+  //const mapRef = useRef<LeafletMapInstance | null>(null);
 
-  function scrollToStation(station: StationInformation) {
+
+  /*function scrollToStation(station: StationInformation) {
     const card = stationCardRefs.current.get(station.station_id) ?? null;
     activeStationRef.current = card;
     card?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -103,6 +108,7 @@ export default function Home() {
       mapRef.current.flyTo([station.lat, station.lon], 18);
     }
   }
+  */
 
   return (
     <main className="min-h-screen bg-[#050816] text-slate-100">
@@ -206,24 +212,10 @@ export default function Home() {
             </div>
           ) : (
             <div className="flex flex-row gap-4">
-              <div className="grid gap-4 grid-cols-1 h-[100vh] overflow-y-auto">
-                {stations.map((station) => (
-                  <StationCard
-                    station={station}
-                    key={station.station_id}
-                    cardRef={(element) => {
-                      if (element) stationCardRefs.current.set(station.station_id, element);
-                      else stationCardRefs.current.delete(station.station_id);
-                    }}
-                    onClick={mapPanToStation}
-                  />
-                ))}
-              </div>
+              <StationList />
               <div className="flex w-full">
                 {/* Map container */}
-                {stations && (
-                  <LeafletMap stations={stations} onMarkerClick={scrollToStation} mapRef={mapRef} />
-                )}
+                {stations && (<LeafletMap />)}
               </div>
             </div>
           )}
