@@ -1,4 +1,3 @@
-import { useMap } from "react-leaflet/hooks";
 import type { StationInformation } from "../libs/gbfs/gbfs-client";
 
 interface StationCardProps {
@@ -8,11 +7,14 @@ interface StationCardProps {
 }
 
 export default function StationCard({ station, cardRef, onClick }: StationCardProps) {
+    const stationAvailabilityPercent = station.capacity && station.capacity > 0
+        ? Math.round(((station.num_bikes_available ?? 0) / station.capacity) * 100)
+        : null;
     return (
         <div
             key={station.station_id}
             ref={cardRef}
-            className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 transition hover:border-cyan-400/40 hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]"
+            className="rounded-2xl border border-slate-800 p-4 transition hover:border-cyan-400/40 hover:shadow-[0_0_20px_rgba(34,211,238,0.1)] hover:cursor-pointer"
             onClick={() => onClick(station)}
         >
             <div className="mb-4 flex items-start justify-between gap-3">
@@ -20,17 +22,15 @@ export default function StationCard({ station, cardRef, onClick }: StationCardPr
                     <p className="text-sm font-medium text-white">
                         {station.name || "Unnamed station"}
                     </p>
-                    <p className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-400">
-                        {station.station_id}
-                    </p>
                 </div>
                 <span
-                    className={`rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.2em] ${station.is_installed === false
+                    className={`rounded-full px-2 py-1 text-[10px] font-medium uppercase tracking-[0.2em] ${station.is_installed == false
                             ? "bg-rose-500/10 text-rose-300"
                             : "bg-emerald-500/10 text-emerald-300"
                         }`}
                 >
-                    {station.is_installed === false ? "Offline" : "Open"}
+                    {station.is_installed == false ? "Offline" : "Open"}
+                    {station.is_installed == true && ` · ${stationAvailabilityPercent !== null ? `${stationAvailabilityPercent}%` : ""}`}
                 </span>
             </div>
 

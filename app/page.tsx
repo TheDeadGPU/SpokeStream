@@ -7,6 +7,7 @@ import { GbfsClient, PRESET_CITIES, StationInformation } from "@/libs/gbfs/gbfs-
 import StationCard from "@/components/StationCard";
 import { MapContainer } from "react-leaflet";
 import type { Map as LeafletMapInstance } from "leaflet";
+import { IconBike, IconGlobe, IconWorld } from "@tabler/icons-react";
 
 
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
@@ -94,7 +95,7 @@ export default function Home() {
   function scrollToStation(station: StationInformation) {
     const card = stationCardRefs.current.get(station.station_id) ?? null;
     activeStationRef.current = card;
-    card?.scrollIntoView({behavior:"smooth", block:"start"});
+    card?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function mapPanToStation(station: StationInformation) {
@@ -107,38 +108,45 @@ export default function Home() {
     <main className="min-h-screen bg-[#050816] text-slate-100">
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-8 sm:px-6 lg:px-8">
         <header className="mb-8 flex flex-col gap-4 rounded-2xl border border-cyan-400/20 bg-slate-950/70 p-5 shadow-[0_0_30px_rgba(34,211,238,0.15)] backdrop-blur-sm md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.35em] text-cyan-300/80">
-              SpokeStream
-            </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">
-              Live bike network status
-            </h1>
+          <div className="flex flex-row gap-2 items-center">
+            <div className="bg-blue-400 p-2 rounded-full">
+              <IconBike className="text-black" />
+            </div>
+            <div>
+              <h1 className="text-lg font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent">
+                SpokeStream
+              </h1>
+              <p className="text-xs text-slate-400 font-medium">Live GBFS Bikeshare Telemetry & Fleet Monitor</p>
+            </div>
           </div>
 
           <label className="flex min-w-0 flex-col gap-2 text-sm text-slate-300">
             <span className="text-xs uppercase tracking-[0.2em] text-slate-400">
               City feed
             </span>
-            <select
-              value={selectedCity.name}
-              onChange={(event) => {
-                const city = PRESET_CITIES.find(
-                  (option) => option.name === event.target.value,
-                );
-
-                if (city) {
-                  setSelectedCity(city);
-                }
-              }}
-              className="rounded-xl border border-cyan-400/30 bg-slate-900 px-4 py-2.5 text-sm text-slate-100 shadow-inner shadow-cyan-500/10 outline-none transition focus:border-cyan-300"
+            <div className="flex gap-2 rounded-xl border border-cyan-400/30 bg-slate-900 px-4 py-2.5 text-sm text-slate-100 shadow-inner shadow-cyan-500/10 outline-none transition focus:border-cyan-300"
             >
-              {PRESET_CITIES.map((city) => (
-                <option key={city.name} value={city.name}>
-                  {city.name}
-                </option>
-              ))}
-            </select>
+              <IconWorld className="text-slate-400" />
+              <select
+                value={selectedCity.name}
+                className="bg-transparent text-sm font-medium text-slate-200 outline-none cursor-pointer pr-2"
+                onChange={(event) => {
+                  const city = PRESET_CITIES.find(
+                    (option) => option.name === event.target.value,
+                  );
+
+                  if (city) {
+                    setSelectedCity(city);
+                  }
+                }}
+              >
+                {PRESET_CITIES.map((city) => (
+                  <option key={city.name} value={city.name}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </label>
         </header>
 
@@ -200,19 +208,22 @@ export default function Home() {
             <div className="flex flex-row gap-4">
               <div className="grid gap-4 grid-cols-1 h-[100vh] overflow-y-auto">
                 {stations.map((station) => (
-                  <StationCard 
-                  station={station} 
-                  key={station.station_id}
-                  cardRef={(element) => {
-                    if(element) stationCardRefs.current.set(station.station_id, element);
-                    else stationCardRefs.current.delete(station.station_id);
-                  }}
-                  onClick={mapPanToStation}
-                   />
+                  <StationCard
+                    station={station}
+                    key={station.station_id}
+                    cardRef={(element) => {
+                      if (element) stationCardRefs.current.set(station.station_id, element);
+                      else stationCardRefs.current.delete(station.station_id);
+                    }}
+                    onClick={mapPanToStation}
+                  />
                 ))}
               </div>
               <div className="flex w-full">
-                <LeafletMap stations={stations} onMarkerClick={scrollToStation} mapRef={mapRef} />
+                {/* Map container */}
+                {stations && (
+                  <LeafletMap stations={stations} onMarkerClick={scrollToStation} mapRef={mapRef} />
+                )}
               </div>
             </div>
           )}

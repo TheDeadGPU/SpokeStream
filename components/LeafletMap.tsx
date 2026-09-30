@@ -14,8 +14,7 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import { StationInformation } from '@/libs/gbfs/gbfs-client';
 
 
-interface LeafletMapProps
-{
+interface LeafletMapProps {
     stations: StationInformation[];
     onMarkerClick?: (station: StationInformation) => void;
     mapRef: React.RefObject<LeafletMapInstance | null>;
@@ -24,6 +23,34 @@ interface LeafletMapProps
 
 
 export default function LeafletMap({ stations, onMarkerClick, mapRef }: LeafletMapProps) {
+
+    const icons = {
+        redIcon: new L.Icon({
+            iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+            shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        }),
+        green: new L.Icon({
+            iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+            shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        }),
+        blue: new L.Icon({
+            iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
+            shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        })
+    };
+
     return (
         <div className='flex w-[100%] rounded-xl'>
             <MapContainer ref={mapRef} center={[40.730610, -73.935242]} zoom={13} style={{ height: '100vh', width: '100%' }}>
@@ -31,19 +58,17 @@ export default function LeafletMap({ stations, onMarkerClick, mapRef }: LeafletM
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 />
-                <Marker position={[1.3521, 103.8198]}>
-                    <Popup>Singapore Center</Popup>
-                </Marker>
                 {stations?.map((station) => {
                     if (typeof station.lat !== 'number' || typeof station.lon !== 'number') {
                         return null;
                     }
 
                     return (
-                        <Marker 
-                            key={station.station_id} 
+                        <Marker
+                            key={station.station_id}
                             position={[station.lat, station.lon]}
                             eventHandlers={{ click: () => onMarkerClick?.(station) }}
+                            icon={station.is_installed ? icons.green : icons.redIcon}
                         >
                             <Popup>{station.name}</Popup>
                         </Marker>
