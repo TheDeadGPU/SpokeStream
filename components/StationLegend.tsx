@@ -14,8 +14,8 @@ export default function StationLegend() {
             const container = L.DomUtil.create('div', 'station-legend');
             container.innerHTML = `
                 <h2>Availability Legend</h2>
-                <div><span class="station-legend__swatch station-legend__swatch--installed"></span> Installed</div>
-                <div><span class="station-legend__swatch station-legend__swatch--not-installed"></span> Not installed</div>
+                <div><span class="station-legend__swatch station-legend__swatch--installed"></span> Renting</div>
+                <div><span class="station-legend__swatch station-legend__swatch--not-installed"></span> Not Renting</div>
             `;
             L.DomEvent.disableClickPropagation(container);
             return container;
