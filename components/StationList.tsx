@@ -3,44 +3,37 @@
 import { StationInformation } from "@/libs/gbfs/gbfs-client";
 import useSpokeStreamStore from "@/hook/useSpokeStreamStore";
 import StationCard from "./StationCard";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IconMapPin, IconSearch } from "@tabler/icons-react";
 import LocateButton from "./LocateButton";
 
 export default function StationList() {
 
-    const {
-        stations,
-        activeStation,
-        setActiveStation,
-        mapRef
-    } = useSpokeStreamStore();
+    const { stations, activeStation, setActiveStation, mapRef } = useSpokeStreamStore();
     const stationCardRefs = useRef(new Map<string, HTMLDivElement>());
     const [searchQuery, setSearchQuery] = useState("");
 
-    function mapPanToStation(station: StationInformation | null) {
+    const mapPanToStation = useCallback((station: StationInformation | null) => {
         if (mapRef.current && station && typeof station.lat === 'number' && typeof station.lon === 'number') {
             mapRef.current.flyTo([station.lat, station.lon], 18);
         }
-    }
-    function scrollToStation(station: StationInformation | null) {
-        if (station) {
-            console.log("Going to station");
-            const card = stationCardRefs.current.get(station.station_id) ?? null;
-            //activeStationRef.current = card;
-            card?.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-    }
+    }, [mapRef]);
+
+    const scrollToStation = useCallback((station: StationInformation | null) => {
+        if(!station) return;
+        const card = stationCardRefs.current.get(station.station_id) ?? null;
+        card?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, []);
 
     useEffect(() => {
         mapPanToStation(activeStation);
         scrollToStation(activeStation);
-    }, [activeStation])
+    }, [activeStation, mapPanToStation, scrollToStation])
 
     const normalizedQuery = searchQuery.toLowerCase();
     const filteredStations = useMemo(() => {
         if (!normalizedQuery) return stations;
-        return stations.filter((station) => station.name.toLowerCase().includes(normalizedQuery));
+        return stations.filter((station) => station.name.trim().toLowerCase().includes(normalizedQuery));
     }, [stations, normalizedQuery]);
     return (
         <div className="flex w-[350px] shrink-0 flex-col">
@@ -58,7 +51,7 @@ export default function StationList() {
                 </div>
             </div>
             <div className="grid gap-4 grid-cols-1 h-[100vh] overflow-y-auto mt-2">
-                {filteredStations && filteredStations.map((station) => (
+                {filteredStations.map((station) => (
                     <StationCard
                         station={station}
                         key={station.station_id}
@@ -69,7 +62,7 @@ export default function StationList() {
                         onClick={() => setActiveStation(station)}
                     />
                 ))}
-                {filteredStations.length == 0 && (
+                {filteredStations.length === 0 && (
                     <div>
                         <p className="text-center">No stations match your criteria</p>
                     </div>
