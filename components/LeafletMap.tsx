@@ -13,6 +13,7 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 
 import { StationInformation } from '@/libs/gbfs/gbfs-client';
 import useSpokeStreamStore from '@/hook/useSpokeStreamStore';
+import StationLegend from './StationLegend';
 
 
 interface LeafletMapProps {
@@ -21,7 +22,7 @@ interface LeafletMapProps {
 
 
 
-export default function LeafletMap({onMarkerClick}: LeafletMapProps) {
+export default function LeafletMap({ onMarkerClick }: LeafletMapProps) {
 
     const icons = {
         redIcon: new L.Icon({
@@ -55,7 +56,7 @@ export default function LeafletMap({onMarkerClick}: LeafletMapProps) {
         activeStation,
         setActiveStation,
         mapRef,
-    }= useSpokeStreamStore();
+    } = useSpokeStreamStore();
 
     return (
         <div className='flex w-[100%] rounded-xl'>
@@ -64,6 +65,7 @@ export default function LeafletMap({onMarkerClick}: LeafletMapProps) {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 />
+                <StationLegend />
                 {stations?.map((station) => {
                     if (typeof station.lat !== 'number' || typeof station.lon !== 'number') {
                         return null;
@@ -73,10 +75,28 @@ export default function LeafletMap({onMarkerClick}: LeafletMapProps) {
                         <Marker
                             key={station.station_id}
                             position={[station.lat, station.lon]}
-                            eventHandlers={{ click: () =>  setActiveStation(station)}}
+                            eventHandlers={{ click: () => setActiveStation(station) }}
                             icon={station.is_installed ? icons.green : icons.redIcon}
                         >
-                            <Popup>{station.name}</Popup>
+                            <Popup>
+                                <strong>{station.name}</strong>
+                                <div className='flex gap-1'>
+                                    <p className="text-xs font-bold">🚴 Bikes Available:</p>
+                                    <p className="text-xs"> {station.num_bikes_available}</p>
+                                </div>
+                                <div className='flex gap-1'>
+                                    <p className="text-xs font-bold">⚡ E-Bikes Available:</p>
+                                    <p className="text-xs"> {station.num_ebikes_available}</p>
+                                </div>
+                                <div className='flex gap-1'>
+                                    <p className="text-xs font-bold">🅿️ Docks Available:</p>
+                                    <p className="text-xs"> {station.num_docks_available}</p>
+                                </div>
+                                <div className='flex gap-1'>
+                                    <p className="text-xs font-bold">Capacity:</p>
+                                    <p className="text-xs"> {station.capacity}</p>
+                                </div>
+                            </Popup>
                         </Marker>
                     );
                 })}

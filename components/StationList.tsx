@@ -28,7 +28,7 @@ export default function StationList() {
             console.log("Going to station");
             const card = stationCardRefs.current.get(station.station_id) ?? null;
             //activeStationRef.current = card;
-            card?.scrollIntoView({ behavior: "smooth", block: "start" });
+            card?.scrollIntoView({ behavior: "smooth", block: "center" });
         }
     }
 
