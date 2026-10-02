@@ -7,15 +7,17 @@ export default function useStations(cityUrl: string)
     const setStations = useSpokeStreamStore((state) => state.setStations);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
     useEffect(() => {
         let ignore = false;
+        let hasLoaded = false;
 
-        async function loadStations()
+        async function fetchStations()
         {
-            setLoading(true);
-            setError(null);
-
+            if (!hasLoaded) {
+                setLoading(true);
+            }
             try
             {
                 const client = new GbfsClient();
@@ -24,32 +26,36 @@ export default function useStations(cityUrl: string)
                 if(!ignore)
                 {
                     setStations(data.stations);
+                    setLastUpdated(new Date());
+                    setError(null);
                 }
             } 
             catch (err)
             {
                 if(!ignore)
                 {
-                    setError(err instanceof Error ? err.message : "Unable to load bike share data right now.");
-                    setStations([]);
-                    
+                    setError(err instanceof Error ? err.message : "Unable to load bike share data right now."); 
                 }
             }
             finally
             {
                 if(!ignore)
                 {
+                    hasLoaded = true;
                     setLoading(false);
                 }
             }
         }
 
-        loadStations();
+        fetchStations();
+
+        const interval = setInterval(fetchStations, 60000);
 
         return () => {
             ignore = true;
+            clearInterval(interval);
         };
     },[cityUrl, setStations]);
 
-    return { loading, error };
+    return { loading, error, lastUpdated };
 }

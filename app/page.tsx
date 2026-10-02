@@ -19,7 +19,7 @@ type CityOption = (typeof PRESET_CITIES)[number];
 
 export default function Home() {
   const [selectedCity, setSelectedCity] = useState<CityOption>(PRESET_CITIES[0]);
-  const { loading, error } = useStations(selectedCity.url);
+  const { loading, error, lastUpdated } = useStations(selectedCity.url);
   const {
     stations,
     userLocation,
@@ -146,6 +146,7 @@ export default function Home() {
                 <span className="ml-2 inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
               )}
             </span>
+            {lastUpdated?.toLocaleTimeString()}
           </div>
 
           {error ? (
