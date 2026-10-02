@@ -10,6 +10,8 @@ import type { Map as LeafletMapInstance } from "leaflet";
 import { IconBike, IconGlobe, IconWorld } from "@tabler/icons-react";
 import useSpokeStreamStore from "@/hook/useSpokeStreamStore";
 import StationList from "@/components/StationList";
+import useUserLocation from "@/hook/useUserLocation";
+import useStations from "@/hook/useStations";
 
 
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), {
@@ -21,50 +23,13 @@ type CityOption = (typeof PRESET_CITIES)[number];
 
 export default function Home() {
   const [selectedCity, setSelectedCity] = useState<CityOption>(PRESET_CITIES[0]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { 
-    stations, 
+  const { loading, error } = useStations(selectedCity.url);
+  const {
+    stations,
     setStations,
-    mapRef 
+    userLocation,
+    mapRef
   } = useSpokeStreamStore();
-
-  useEffect(() => {
-    let ignore = false;
-
-    async function loadStations() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const client = new GbfsClient();
-        const data = await client.getGBFS(selectedCity.url);
-
-        if (!ignore) {
-          setStations(data.stations);
-        }
-      } catch (err) {
-        if (!ignore) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Unable to load bike share data right now.",
-          );
-          setStations([]);
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    }
-
-    void loadStations();
-
-    return () => {
-      ignore = true;
-    };
-  }, [selectedCity]);
 
   const summary = useMemo(() => {
     const totalBikes = stations.reduce(
@@ -92,23 +57,11 @@ export default function Home() {
     };
   }, [stations]);
 
-  //const activeStationRef = useRef<HTMLDivElement | null>(null);
-  //const stationCardRefs = useRef(new Map<string, HTMLDivElement>());
-  //const mapRef = useRef<LeafletMapInstance | null>(null);
-
-
-  /*function scrollToStation(station: StationInformation) {
-    const card = stationCardRefs.current.get(station.station_id) ?? null;
-    activeStationRef.current = card;
-    card?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  function mapPanToStation(station: StationInformation) {
-    if (mapRef.current && typeof station.lat === 'number' && typeof station.lon === 'number') {
-      mapRef.current.flyTo([station.lat, station.lon], 18);
+  useEffect(() => {
+    if (userLocation) {
+      mapRef.current?.flyTo([userLocation?.lat, userLocation?.lon], 13)
     }
-  }
-  */
+  }, [userLocation])
 
   return (
     <main className="min-h-screen bg-[#050816] text-slate-100">
