@@ -11,18 +11,19 @@ import type { Map as LeafletMapInstance } from "leaflet";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 
-import { StationInformation } from '@/libs/gbfs/gbfs-client';
+import { PRESET_CITIES, StationInformation } from '@/libs/gbfs/gbfs-client';
 import useSpokeStreamStore from '@/hook/useSpokeStreamStore';
 import StationLegend from './StationLegend';
 
-
+type CityOption = (typeof PRESET_CITIES)[number];
 interface LeafletMapProps {
+    selectedCity: CityOption;
     onMarkerClick?: (station: StationInformation) => void;
 }
 
 
 
-export default function LeafletMap({ onMarkerClick }: LeafletMapProps) {
+export default function LeafletMap({ selectedCity, onMarkerClick }: LeafletMapProps) {
 
     const icons = {
         redIcon: new L.Icon({
@@ -60,7 +61,7 @@ export default function LeafletMap({ onMarkerClick }: LeafletMapProps) {
 
     return (
         <div className='flex w-[100%] rounded-xl'>
-            <MapContainer ref={mapRef} center={[40.730610, -73.935242]} zoom={13} style={{ height: '100vh', width: '100%' }}>
+            <MapContainer ref={mapRef} center={[selectedCity.coordinates.lat, selectedCity.coordinates.lon]} zoom={13} style={{ height: '100vh', width: '100%' }}>
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

@@ -3,14 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 
-import { GbfsClient, PRESET_CITIES, StationInformation } from "@/libs/gbfs/gbfs-client";
-import StationCard from "@/components/StationCard";
-import { MapContainer } from "react-leaflet";
-import type { Map as LeafletMapInstance } from "leaflet";
-import { IconBike, IconGlobe, IconWorld } from "@tabler/icons-react";
+import { PRESET_CITIES } from "@/libs/gbfs/gbfs-client";
+import { IconBike, IconCircleDot, IconGps, IconMotorbike, IconWorld } from "@tabler/icons-react";
 import useSpokeStreamStore from "@/hook/useSpokeStreamStore";
 import StationList from "@/components/StationList";
-import useUserLocation from "@/hook/useUserLocation";
 import useStations from "@/hook/useStations";
 
 
@@ -26,7 +22,6 @@ export default function Home() {
   const { loading, error } = useStations(selectedCity.url);
   const {
     stations,
-    setStations,
     userLocation,
     mapRef
   } = useSpokeStreamStore();
@@ -61,7 +56,7 @@ export default function Home() {
     if (userLocation) {
       mapRef.current?.flyTo([userLocation?.lat, userLocation?.lon], 13)
     }
-  }, [userLocation])
+  }, [userLocation]);
 
   return (
     <main className="min-h-screen bg-[#050816] text-slate-100">
@@ -111,18 +106,21 @@ export default function Home() {
 
         <section className="mb-8 grid gap-4 md:grid-cols-4">
           {[
-            { label: "Available bikes", value: summary.totalBikes.toLocaleString(), accent: "cyan" },
-            { label: "Available e-bikes", value: summary.totalEbikes.toLocaleString(), accent: "yellow" },
-            { label: "Open docks", value: summary.totalDocks.toLocaleString(), accent: "emerald" },
-            { label: "Active stations", value: summary.activeStations.toLocaleString(), accent: "violet" },
+            { label: "Available bikes", icon: <IconBike/>, value: summary.totalBikes.toLocaleString(), accent: "cyan" },
+            { label: "Available e-bikes", icon: <IconMotorbike/>, value: summary.totalEbikes.toLocaleString(), accent: "yellow" },
+            { label: "Free docks", icon: <IconCircleDot/>, value: summary.totalDocks.toLocaleString(), accent: "emerald" },
+            { label: "Stations", icon: <IconGps/>, value: summary.activeStations.toLocaleString(), accent: "violet" },
           ].map((item) => (
             <div
               key={item.label}
               className="rounded-2xl border border-slate-800 bg-slate-950/80 p-5 shadow-[0_0_20px_rgba(15,23,42,0.8)]"
             >
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-                {item.label}
-              </p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                  {item.label}
+                </p>
+                <p className={`text-${item.accent}-300`}>{item.icon}</p>
+              </div>
               <p
                 className={`mt-4 text-3xl font-semibold text-${item.accent}-300`}
               >
@@ -168,7 +166,7 @@ export default function Home() {
               <StationList />
               <div className="flex w-full">
                 {/* Map container */}
-                {stations && (<LeafletMap />)}
+                {stations && (<LeafletMap selectedCity={selectedCity} />)}
               </div>
             </div>
           )}

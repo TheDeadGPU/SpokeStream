@@ -1,11 +1,11 @@
 
 export const PRESET_CITIES = [
-  { name: "Citi Bike (New York, NY)", url: "https://gbfs.citibikenyc.com/gbfs/gbfs.json" },
-  { name: "Capital Bikeshare (Washington, DC)", url: "https://gbfs.capitalbikeshare.com/gbfs/gbfs.json" },
-  { name: "Divvy (Chicago, IL)", url: "https://gbfs.divvybikes.com/gbfs/gbfs.json" },
-  { name: "Bluebikes (Boston, MA)", url: "https://gbfs.bluebikes.com/gbfs/gbfs.json" },
-  { name: "B-cycle (Austin, TX)", url: "https://gbfs.austinbcycle.com/gbfs/gbfs.json" },
-  { name: "Santander Cycles (London, UK)", url: "https://gbfs.shared.bike/gbfs/gbfs.json" },
+  { name: "Citi Bike (New York, NY)", url: "https://gbfs.citibikenyc.com/gbfs/gbfs.json", coordinates: {lat:40.71427, lon: -74.00597 } },
+  { name: "Capital Bikeshare (Washington, DC)", url: "https://gbfs.capitalbikeshare.com/gbfs/gbfs.json", coordinates: {lat: 38.89511, lon: -77.03637} },
+  { name: "Divvy (Chicago, IL)", url: "https://gbfs.divvybikes.com/gbfs/gbfs.json", coordinates: {lat: 41.85003, lon: -87.65005} },
+  { name: "Bluebikes (Boston, MA)", url: "https://gbfs.bluebikes.com/gbfs/gbfs.json", coordinates: {lat: 42.35843, lon: -71.05977} },
+  { name: "B-cycle (Austin, TX)", url: "https://gbfs.austinbcycle.com/gbfs/gbfs.json", coordinates: {lat: 30.26715, lon: -97.74306} },
+  { name: "Santander Cycles (London, UK)", url: "https://gbfs.shared.bike/gbfs/gbfs.json", coordinates: {lat: 51.50853, lon: -0.12574} },
 ] as const;
 
 interface Feed {
